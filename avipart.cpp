@@ -111,12 +111,12 @@ typedef uint32_t size; // little endian!
 
 class id {
     typedef uint32_t type;
-    static const type DAMAGED_ID = 0xFFFFFFFF;
+    static const type DAMAGED_ID_VALUE;
     
     type m_val;
     
 public:
-    id(type i = DAMAGED_ID) : m_val(i) { }
+    id(type i = DAMAGED_ID_VALUE) : m_val(i) { }
     
     type value() const { return m_val; }
     std::string string() const { return fmt::stringf("%.4s", chars()); }
@@ -126,6 +126,11 @@ public:
     bool operator!=(const id& other) const { return !(*this == other); }
 };
 
+const id::type id::DAMAGED_ID_VALUE = 0xFFFFFFFF;
+
+const id LIST_ID('LIST');
+const id AVI_ID('RIFF');
+const id AVI_LIST_ID('AVI ');
 
 class mmap {
     filedesc m_fd;
@@ -227,7 +232,7 @@ public:
 };
 
 bool chunk_base::is_list() const {
-    return m_chunk_id == list_chunk::ID || m_chunk_id == file::ID;
+    return m_chunk_id == LIST_ID || m_chunk_id == AVI_ID;
 }
 
 void chunk_base::init(offset off, const mem_chunk_header *mem,
@@ -273,7 +278,7 @@ class list_chunk : public chunk_base {
     id m_list_id;
     
 public:
-    static const id ID('LIST');
+    static const id ID;
     
     list_chunk(const mmap& map, offset off);
     
@@ -286,13 +291,15 @@ list_chunk::list_chunk(const mmap& map, offset off) : chunk_base(map) {
     m_list_id = mem->list_id;
 }
 
+const id list_chunk::ID('LIST');
+
 
 class file {
     mmap m_map;
     
 public:
-    static const id ID('RIFF');
-    static const id LIST_ID('AVI ');
+    static const id ID;
+    static const id LIST_ID;
     
     file(const std::string& name);
     virtual ~file() { }
@@ -304,6 +311,9 @@ file::file(const std::string& name) : m_map(name) {
         fmt::throwf<std::invalid_argument>(_("'%s' doesn't look like an AVI "
             "file"), name.c_str());
 }
+
+const id file::ID('RIFF');
+const id file::LIST_ID('AVI ');
 
 } // namespace avi
 
