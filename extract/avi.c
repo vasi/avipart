@@ -209,20 +209,31 @@ avi_writer avi_write_start(avi_header *hdr, int writefd) {
 	uint32_t hdr_size;
 	int stop;
 	char *buf, *end;
+	mem_range pad;
 	
+	/* Setup the writer */
+	wr.writefd = writefd;
+	wr.frame_data_written = 0;
+	
+	/* Write the header */
 	hdr_size = (char*)hdr->movi.data - (char*)hdr->file.map;
 	
 	buf = malloc(hdr_size);
 	end = avi_write_hdr_chunk(avi_real_root(hdr->file), buf, &stop);
 	hdr_size = end - buf;
-	
-	wr.writefd = writefd;
 	wr.frames_start = hdr_size;
-	wr.frame_data_written = 0;
 	
 	if (write(writefd, buf, hdr_size) != hdr_size)
 		die("Can't write header");
 	free(buf);
+	
+	/* Write any initial padding */
+	pad = avi_find_padding(hdr);
+	if (pad.size) {
+		if (write(writefd, pad.start, pad.size) != pad.size)
+			die("Can't write padding");
+		wr.frame_data_written += pad.size;
+	}
 	
 	return wr;
 }
@@ -256,6 +267,32 @@ void avi_write_finish(avi_writer *wr) {
 	if (write(fd, &frames_size_le, 4) != 4) die("Can't write frames size");
 	
 	close(fd);
+}
+
+mem_range avi_find_padding(avi_header *hdr) {
+	mem_range range;
+	char *cur, *last;
+	uint32_t pad_id = 0;
+	avi_chunk chunk;
+	
+	last = cur = range.start = (char*)hdr->movi.data;
+	while (cur < range.start + hdr->movi.size) {
+		chunk = read_chunk(cur);
+		if (!is_frame_id(&chunk.chunk_id) || is_chunk_list(chunk.chunk_id))
+			break;
+		
+		if (pad_id) {
+			if (pad_id != chunk.chunk_id) break;
+		} else {
+			pad_id = chunk.chunk_id;
+		}
+		
+		last = cur;
+		cur = (char*)chunk.data + chunk.size;
+	}
+	
+	range.size = last - range.start;
+	return range;
 }
 
 void avi_find_frames(avi_header *hdr, uint32_t offset, uint32_t maxsize,

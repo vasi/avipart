@@ -30,6 +30,10 @@ typedef struct {
 	uint32_t frame_data_written;
 } avi_writer;
 
+typedef struct {
+	char *start;
+	uint32_t size;
+} mem_range;
 
 int is_chunk_list(uint32_t id);
 int is_frame_id(const uint32_t *p);
@@ -45,6 +49,8 @@ avi_file avi_file_read(int fd);
 avi_file avi_file_read_name(const char *name);
 avi_chunk avi_real_root(avi_file file);
 avi_header avi_get_header(avi_file file);
+
+mem_range avi_find_padding(avi_header *file);
 
 avi_writer avi_write_start(avi_header *hdr, int writefd);
 void avi_write_frames(avi_writer *wr, void *start, void *end);
