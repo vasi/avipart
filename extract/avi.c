@@ -227,7 +227,9 @@ avi_writer avi_write_start(avi_header *hdr, int writefd) {
 		die("Can't write header");
 	free(buf);
 	
-	/* Write any initial padding */
+	/* Sometimes an AVI is crudely synced by padding the beginning of
+	 * one stream. If that padding isn't reproduced at the start of an
+	 * extracted segment, it will have A/V sync problems. */
 	pad = avi_find_padding(hdr);
 	if (pad.size) {
 		if (write(writefd, pad.start, pad.size) != pad.size)
