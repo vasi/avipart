@@ -15,4 +15,17 @@ file::file(const std::string& name) : m_map(name) {
             "file"), name.c_str());
 }
 
-} // namespace avi
+const mmap& file::map() const {
+    return m_map;
+}
+
+offset file::list_data_offset() const {
+    return 0;
+}
+
+size_t file::list_data_size() const {
+    return m_map.size();
+}
+
+
+}

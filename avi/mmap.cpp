@@ -42,6 +42,10 @@ mmap::~mmap() {
     if (m_fd >= 0) close(m_fd);
 }
 
+size_t mmap::size() const {
+    return m_len;
+}
+
 void mmap::check(offset off, size_t sz) const {
     if (off < 0 || off + sz > m_len)
         throw(std::out_of_range(_("out of range in avi")));
@@ -55,5 +59,10 @@ const char *mmap::cdata(offset off, size_t sz) const {
     check(off, sz);
     return reinterpret_cast<char*>(m_addr) + off;
 }
+
+bool mmap::operator==(const mmap& other) const {
+    return m_fd == other.m_fd; // Should guarantee others are the same, too
+}
+
 
 }

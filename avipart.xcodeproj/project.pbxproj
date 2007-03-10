@@ -30,6 +30,8 @@
 		59F0EB190BA232030090606F /* format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 59F0EB150BA232030090606F /* format.cpp */; };
 		59F0EB1A0BA232030090606F /* format.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 59F0EB160BA232030090606F /* format.h */; };
 		59F0EB1C0BA232030090606F /* format_internal.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 59F0EB180BA232030090606F /* format_internal.h */; };
+		59F0EB950BA2363B0090606F /* list.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 59F0EB930BA2363B0090606F /* list.h */; };
+		59F0EB960BA2363B0090606F /* list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 59F0EB940BA2363B0090606F /* list.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -53,6 +55,7 @@
 				597C829F0BA22E2B00ADF4B5 /* list_chunk.h in CopyFiles */,
 				59F0EB1A0BA232030090606F /* format.h in CopyFiles */,
 				59F0EB1C0BA232030090606F /* format_internal.h in CopyFiles */,
+				59F0EB950BA2363B0090606F /* list.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
@@ -85,6 +88,8 @@
 		59F0EB170BA232030090606F /* format.tcc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = format.tcc; sourceTree = "<group>"; };
 		59F0EB180BA232030090606F /* format_internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = format_internal.h; sourceTree = "<group>"; };
 		59F0EB270BA232C30090606F /* mmap.tcc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mmap.tcc; sourceTree = "<group>"; };
+		59F0EB930BA2363B0090606F /* list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = list.h; sourceTree = "<group>"; };
+		59F0EB940BA2363B0090606F /* list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list.cpp; sourceTree = "<group>"; };
 		8DD76F6C0486A84900D96B5E /* avipart */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = avipart; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -145,6 +150,8 @@
 				597C81730BA224B900ADF4B5 /* id.cpp */,
 				597C81720BA224B900ADF4B5 /* id.h */,
 				597C828B0BA22DB200ADF4B5 /* internal.h */,
+				59F0EB940BA2363B0090606F /* list.cpp */,
+				59F0EB930BA2363B0090606F /* list.h */,
 				597C829E0BA22E2B00ADF4B5 /* list_chunk.cpp */,
 				597C829D0BA22E2B00ADF4B5 /* list_chunk.h */,
 				597C81CB0BA228D900ADF4B5 /* mmap.cpp */,
@@ -215,6 +222,7 @@
 				597C82810BA22D6500ADF4B5 /* chunk.cpp in Sources */,
 				597C82A00BA22E2B00ADF4B5 /* list_chunk.cpp in Sources */,
 				59F0EB190BA232030090606F /* format.cpp in Sources */,
+				59F0EB960BA2363B0090606F /* list.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

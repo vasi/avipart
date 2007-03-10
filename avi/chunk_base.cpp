@@ -1,5 +1,6 @@
 #include "avi/chunk_base.h"
 
+#include "avi/chunk.h"
 #include "avi/list_chunk.h"
 #include "avi/file.h"
 #include "endian.h"
@@ -26,7 +27,7 @@ const void *chunk_base::data() const {
 }
 
 bool chunk_base::is_list() const {
-    return m_chunk_id == list_chunk::ID || m_chunk_id == file::ID;
+    return is_list_id(m_chunk_id);
 }
 
 void chunk_base::init(offset off, const mem_chunk_header *mem,
@@ -41,5 +42,17 @@ void chunk_base::init(offset off, const mem_chunk_header *mem,
     m_data_size = m_total_size - data_start;
 }
 
+bool chunk_base::is_list_id(id i) {
+    return i == list_chunk::ID || i == file::ID;
+}
+
+chunk_base* chunk_base::create(const mmap& map, offset off) {
+    id i = map.at<id>(off);
+    if (is_list_id(i)) {
+        return new list_chunk(map, off);
+    } else {
+        return new chunk(map, off);
+    }
+}
 
 }

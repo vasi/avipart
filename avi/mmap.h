@@ -20,17 +20,23 @@ class mmap {
     // Don't copy
     const mmap& operator=(const mmap& other);
     mmap(const mmap& other);
+    
 public:
     mmap(const std::string& name);
     mmap(filedesc fd);
     virtual ~mmap();
+    
+    size_t size() const;
     
     void check(offset off, size_t sz) const;
     const void *data(offset off, size_t sz) const;
     
     template <typename T> T at(offset off) const;
     template <typename T> const T* mem(offset off) const;
+    
+    bool operator==(const mmap& other) const;
 };
+
 
 }
 

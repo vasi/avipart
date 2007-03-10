@@ -20,6 +20,18 @@ id list_chunk::list_id() const {
     return m_list_id;
 }
 
+const mmap& list_chunk::map() const {
+    return m_map;
+}
+
+offset list_chunk::list_data_offset() const {
+    return m_data_offset;
+}
+
+size_t list_chunk::list_data_size() const {
+    return data_size();
+}
+
 const id list_chunk::ID('LIST');
 
 }

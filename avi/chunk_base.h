@@ -15,8 +15,7 @@ struct mem_chunk_header {
 
 class chunk_base { // abstract
 protected:
-    const mmap& m_map;
-    
+    const mmap& m_map; 
     id m_chunk_id;
     size_t m_total_size;
     size_t m_data_size;
@@ -25,6 +24,8 @@ protected:
     // Call in subclass constructor. Data_start should be the offset from
     // 'off' to the start of the chunk's data.
     void init(offset off, const mem_chunk_header *mem, size_t data_start);
+    
+    static bool is_list_id(id i);
     
 public:
     chunk_base(const mmap& map);
@@ -36,6 +37,8 @@ public:
     size_t total_size() const;
     size_t data_size() const;
     const void *data() const;
+    
+    static chunk_base *create(const mmap& map, offset off);
 };
 
 }
