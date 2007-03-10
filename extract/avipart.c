@@ -7,20 +7,11 @@
 
 static char *progname; /* The name of this program */
 
-void usage(const char *err);	/* Print usage and exit */
-
-/* Turn a size string  (eg: 100M) into a number of bytes */
-uint32_t size_to_bytes(const char *psize);
-
-/* Parse the program arguments */
-void parse_args(int argc, char **argv,
-		char **outinfile, char **outoutfile, uint32_t *outoffset);
-
 
 void usage(const char *err) {
 	if (err) fprintf(stderr, "%s\n\n", err);
-	fprintf(stderr, "Usage: %s input.avi output.avi PIECE-SIZE START-PIECE\n",
-		progname);
+	fprintf(stderr, "Usage: %s input.avi output.avi PIECE-SIZE START-PIECE"
+		" [MAX-PIECES]\n", progname);
 	fprintf(stderr, "Extract a part of an avi file.\n");
 	exit(-1);
 }	
@@ -45,34 +36,49 @@ uint32_t size_to_bytes(const char *psize) {
 	return mult * b;
 }
 
+uint32_t strtoul_die(char *str) {
+	char *endp, *msg;
+	
+	errno = 0;
+	uint32_t i = strtoul(str, &endp, 10);
+	
+	if (*str == '\0' || *endp != '\0' || errno) {
+		asprintf(&msg, "'%d' is not a number");
+		usage(msg);
+	}
+	return i;
+}
+
 void parse_args(int argc, char **argv, char **outinfile, char **outoutfile,
-		uint32_t *outoffset) {
-	char *psizestr, *pnumstr, *endp;
+		uint32_t *outoffset, uint32_t *maxsize) {
+	char *psizestr, *pnumstr;
 	uint32_t psize, pnum;
 	
 	progname = argv[0];
-	if (argc == 1) usage(NULL);
-	if (argc != 5) usage("Four arguments required");
+	if (argc < 5) usage("Not enough arguments");
+	if (argc > 6) usage("Too many arguments");
+	
 	*outinfile = argv[1], *outoutfile = argv[2];
 	
 	psizestr = argv[3], pnumstr = argv[4];
 	psize = size_to_bytes(psizestr);
-	errno = 0;
-	pnum = strtoul(pnumstr, &endp, 10);
-	if (*pnumstr == '\0' || *endp != '\0' || errno)
-		usage("Piece number is not a valid number");
+	pnum = strtoul_die(pnumstr);
+	
+	if (argc == 6)
+		*maxsize = strtoul_die(argv[5]) * psize;
 	*outoffset = (pnum - 1) * psize;
 }
 
 int main(int argc, char *argv[]) {
 	char *input, *output;
-	uint32_t offset;
+	uint32_t offset, maxsize;
 	avi_file inavi;
 	
-	parse_args(argc, argv, &input, &output, &offset);
+	maxsize = 0;
+	parse_args(argc, argv, &input, &output, &offset, &maxsize);
 	
 	inavi = avi_file_read_name(input);
-	avipart(inavi, output, offset, 0);
+	avipart(inavi, output, offset, maxsize);
 	
 	return 0;
 }
