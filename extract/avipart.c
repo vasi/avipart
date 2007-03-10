@@ -61,7 +61,7 @@ void parse_args(int argc, char **argv, char **outinfile, char **outoutfile,
 	pnum = strtoul(pnumstr, &endp, 10);
 	if (*pnumstr == '\0' || *endp != '\0' || errno)
 		usage("Piece number is not a valid number");
-	*outoffset = pnum * psize;
+	*outoffset = (pnum - 1) * psize;
 }
 
 int main(int argc, char *argv[]) {
