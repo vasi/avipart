@@ -124,6 +124,15 @@ Q. Hey, what's this 'if you're on Mac OS X' thing about?
 A. There aren't any endian-swapping functions which are standard and cross-platform, so I used the ones on my platform.
 
 
-Q. You should have written your own endian functions OR tested on many platforms OR at least have them modularized!!!
+Q. You should have written your own endian-swapping functions OR tested on many platforms OR at least have them modularized!!!
 
 A. That's not a question, and I'll expect either a patch or a bribe.
+
+
+Q. After I extract a movie, I can't jump forwards and backwards through it. What do I do?
+
+A. Avipart has to get rid of a movie's index in order to extract arbitrary sections. But you can use mencoder to reconstruct the index. You can get mencoder from many different sources, it's part of mplayer. Once you have it installed, run:
+
+	mencoder -forceidx extracted.avi -o fixed.avi -oac copy -ovc copy
+
+After a couple of minutes, you'll have a movie with a working index.
