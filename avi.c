@@ -21,11 +21,13 @@ int is_chunk_list(uint32_t id) {
 
 avi_chunk read_chunk(void *addr) {
 	avi_chunk chunk = *(avi_chunk*)addr;
+	chunk.addr = addr;
 	chunk.size = CFSwapInt32LittleToHost(chunk.size);
 	if (is_chunk_list(chunk.chunk_id)) {
 		chunk.data = (char*)addr + 12;
 		chunk.size -= 4;
 	} else {
+		chunk.list_id = 0;
 		chunk.data = (char*)addr + 8;
 	}
 	return chunk;
@@ -124,11 +126,8 @@ avi_file avi_file_read(int fd) {
 	return file;
 }
 
-avi_header avi_get_header(avi_file file) {
-	avi_chunk root;
-	avi_chunk child;
-	avi_header hdr = { };
-	
+avi_chunk avi_real_root(avi_file file) {
+	avi_chunk root, child;
 	root = file.root;
 	
 	/* Deal with multis */
@@ -138,6 +137,15 @@ avi_header avi_get_header(avi_file file) {
 			die("Can't find real root from multi");
 		root = child;
 	}
+	return root;
+}
+
+avi_header avi_get_header(avi_file file) {
+	avi_chunk root;
+	avi_chunk child;
+	avi_header hdr = { };
+	
+	root = avi_real_root(file);
 	
 	hdr.file = file;
 	child = first_child;
@@ -159,18 +167,63 @@ int is_frame_id(const uint32_t *p) {
 		&& isdigit(c[0]) && isdigit(c[1]);
 }
 
+
+char *avi_write_hdr_chunk(avi_chunk chunk, char *buf, int *stop) {
+	char *next;
+	avi_chunk child;
+	uint32_t id, lid;
+	
+	id = chunk.chunk_id;
+	lid = chunk.list_id;
+	*stop = 0;
+	
+	if (id == 'indx' || lid == 'odml') {
+		return buf;
+	} else if (is_chunk_list(chunk.chunk_id)) {
+		memcpy(buf, chunk.addr, 12);
+		next = buf + 12;
+		
+		if (lid == 'movi') {
+			*stop = 1;
+			return next;
+		}
+			
+		child = first_child;
+		while (next_chunk_child(&chunk, &child)) {
+			next = avi_write_hdr_chunk(child, next, stop);
+			if (*stop) break;
+		}
+		
+		((uint32_t*)buf)[1] = CFSwapInt32HostToLittle(next - buf - 8);
+		return next;
+	} else {
+		memcpy(buf, chunk.addr, chunk.size + 8);
+		next = buf + chunk.size + 8;
+		if ((int)next & 0x1) ++next;
+		return next;
+	}
+}
+
 avi_writer avi_write_start(avi_header *hdr, int writefd) {
 	avi_writer wr;
 	uint32_t hdr_size;
+	int stop;
+	char *buf, *end;
 	
 	hdr_size = (char*)hdr->movi.data - (char*)hdr->file.map;
+	
+	buf = malloc(hdr_size);
+	end = avi_write_hdr_chunk(avi_real_root(hdr->file), buf, &stop);
+	hdr_size = end - buf;
 	
 	wr.writefd = writefd;
 	wr.frames_start = hdr_size;
 	wr.frame_data_written = 0;
 	
-	if (write(writefd, hdr->file.map, hdr_size) != hdr_size)
+	if (write(writefd, buf, hdr_size) != hdr_size)
 		die("Can't write header");
+	free(buf);
+	
 	return wr;
 }
 
@@ -238,7 +291,7 @@ void avi_find_frames(avi_header *hdr, uint32_t offset, uint32_t maxsize,
 	while (addr < end) {
 		chunk = read_chunk(addr);
 		if (chunk.chunk_id == 'LIST') {
-			skip = 1; /* (chunk.list_id != 'rec '); */
+			skip = (chunk.list_id != 'rec ');
 			next = chunk.data;
 		} else if (chunk.chunk_id == 0xFFFFFFFF) { /* damage */
 			break;

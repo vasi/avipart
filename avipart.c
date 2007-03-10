@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
 	parse_args(argc, argv, &input, &output, &offset);
 	
 	inavi = avi_file_read_name(input);
-	avipart(inavi, output, offset, 1024 * 1024 * 50);
+	avipart(inavi, output, offset, 0);
 	
 	return 0;
 }

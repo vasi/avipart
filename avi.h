@@ -5,6 +5,7 @@ typedef struct {
 	uint32_t size;
 	uint32_t list_id; /* only valid for lists */
 	void *data;
+	void *addr;
 } avi_chunk;
 
 typedef struct {
@@ -42,6 +43,7 @@ void avi_dump(avi_chunk chunk, int indent, int full);
 
 avi_file avi_file_read(int fd);
 avi_file avi_file_read_name(const char *name);
+avi_chunk avi_real_root(avi_file file);
 avi_header avi_get_header(avi_file file);
 
 avi_writer avi_write_start(avi_header *hdr, int writefd);

@@ -12,7 +12,6 @@ void usage(const char *err) {
 	exit(-1);
 }	
 
-
 int main(int argc, char *argv[]) {
 	avi_file avi;
 	int full;
