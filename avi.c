@@ -192,12 +192,12 @@ void avi_write_finish(avi_writer *wr) {
 	
 	fd = wr->writefd;
 	tot_size_le = CFSwapInt32HostToLittle(wr->frame_data_written +
-		wr->frames_start);
-	frames_size_le = CFSwapInt32HostToLittle(wr->frame_data_written);
+		wr->frames_start - 8);
+	frames_size_le = CFSwapInt32HostToLittle(wr->frame_data_written + 4);
 	
 	if (lseek(fd, 4, SEEK_SET) == -1) die("Can't seek to file size");
 	if (write(fd, &tot_size_le, 4) != 4) die("Can't write file size");
-	
+
 	if (lseek(fd, wr->frames_start - 8, SEEK_SET) == -1)
 		die("Can't seek to frames size");
 	if (write(fd, &frames_size_le, 4) != 4) die("Can't write frames size");
@@ -238,7 +238,7 @@ void avi_find_frames(avi_header *hdr, uint32_t offset, uint32_t maxsize,
 	while (addr < end) {
 		chunk = read_chunk(addr);
 		if (chunk.chunk_id == 'LIST') {
-			skip = (chunk.list_id != 'rec ');
+			skip = 1; /* (chunk.list_id != 'rec '); */
 			next = chunk.data;
 		} else if (chunk.chunk_id == 0xFFFFFFFF) { /* damage */
 			break;
