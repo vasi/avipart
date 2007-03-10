@@ -23,10 +23,6 @@ public:
     bool operator!=(const id& other) const;
 };
 
-const id LIST_ID('LIST');
-const id AVI_ID('RIFF');
-const id AVI_LIST_ID('AVI ');
-
 }
 
 #endif

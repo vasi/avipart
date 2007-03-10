@@ -1,5 +1,7 @@
 #include "avi/chunk_base.h"
 
+#include "avi/list_chunk.h"
+#include "avi/file.h"
 #include "endian.h"
 
 namespace avi {
@@ -24,7 +26,7 @@ const void *chunk_base::data() const {
 }
 
 bool chunk_base::is_list() const {
-    return m_chunk_id == LIST_ID || m_chunk_id == AVI_ID;
+    return m_chunk_id == list_chunk::ID || m_chunk_id == file::ID;
 }
 
 void chunk_base::init(offset off, const mem_chunk_header *mem,
