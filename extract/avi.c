@@ -108,8 +108,8 @@ avi_file avi_file_read(int fd) {
 	file.size = sb.st_size;
 	if (file.size < 16) die("Input file too small");
 	
-	file.map = mmap(NULL, file.size, PROT_READ, MAP_FILE, fd, 0);
-	if (file.map == (void*)-1) die("Can't map input file");
+	file.map = mmap(NULL, file.size, PROT_READ, MAP_FILE | MAP_SHARED, fd, 0);
+	if (file.map == (void*)-1) perror("Can't map input file");
 	
 	file.root = read_chunk(file.map);
 	if (file.root.chunk_id != 'RIFF' || file.root.list_id != 'AVI ')
