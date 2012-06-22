@@ -66,7 +66,7 @@ void parse_args(int argc, char **argv, char **outinfile, char **outoutfile,
 	
 	if (argc == 6)
 		*maxsize = strtoul_die(argv[5]) * psize;
-	*outoffset = (pnum - 1) * psize;
+	*outoffset = pnum * psize;
 }
 
 int main(int argc, char *argv[]) {
