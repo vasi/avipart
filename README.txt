@@ -53,7 +53,7 @@ Q. How do I download part of a torrent?
 
 A. Use my partorrent project: https://github.com/vasi/partorrent . It requires libtorrent-rasterbar's python bindings.
 
-After you have it install, run './info.py mytorrent.torrent' to see the structure of the torrent file:
+After you have it installed, run './info.py mytorrent.torrent' to see the structure of the torrent file:
 
 	Pieces: 2794
 	Piece size: 256 K
