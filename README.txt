@@ -28,7 +28,7 @@ For obvious reasons, things won't work well with video wrapped in a RAR, or anot
 
 Q. Can I download just parts of other stuff too, like audio? How about software?
 
-A. Sure, as long as the data you want is stored consecutively. Just ignore the instructions about extracting video, and do your own thing with the partially downloaded files. MP3 audio should work easily, and you could probably extract things from the middle of ISOs or tarballs if you really tried--don't ask me how though.
+A. Sure, as long as the data you want is stored sequentially. Just ignore the instructions about extracting video, and do your own thing with the partially downloaded files. MP3 audio should work easily, and you could probably extract things from the middle of ISOs or tarballs if you really tried--don't ask me how though.
 
 
 Q. What are the downsides? (AKA: What can you help fix?)
@@ -40,8 +40,6 @@ A.	- Finding the section of video that you want may take a bit of work.
 		tries to find the parts you want.
 
 
-===== MISC =====
-
 Q. Ok, so how do I get my video?
 
 A. There are two parts, each has its own section below:
@@ -49,19 +47,11 @@ A. There are two parts, each has its own section below:
 	2. Extracting your data from partially-downloaded (aka: "corrupt") files.
 
 
-Q. What's this SVN thing you keep talking about?
-
-A. It's my Subversion version control repository, at http://vasi.dyndns.org:3128/svn/avipart/trunk . If you like pretty things, there's a wonderful and pretty web interface at http://vasi.dyndns.org:3128/trac/browser/avipart/trunk .
-
-
-Q. Oooh, shiny!
-
-A. Indeed.
-
-
 ===== DOWNLOADING =====
 
 Q. How do I download part of a torrent?
+
+FIXME: Update for partorrent
 
 A. Use my custom version of BitTornado. Either use the modified snapshot of 0.3.18 in my SVN, or apply BitTornado.patch from my SVN to a newer version of BitTornado.
 
@@ -74,12 +64,7 @@ Each torrent is divided into a bunch of pieces. This tells you how many pieces t
 
 Now you can run './btdownloadcurses.py mytorrent.torrent --pieces 2000-2500' to grab only pieces 2000 thru 2499 of the torrent. You can supply more complicated piece specifications, eg: '--pieces 1-5,30,300-500,9000-' would download pieces 1 thru 4, piece 30, pieces 300 thru 499, and 9000 thru the end of the torrent.
 
-Note that piece specifications are one-based, ie: piece 1 is the first piece, not piece 0.
-
-
-Q. You dolt! Don't you know that computers number things from zero?
-
-A. I arbitrarily decided to number pieces from one when I started, and now I'm too lazy to change it. Fix it yourself!
+Note that piece specifications are zero-based, ie: piece 0 is the first piece, not piece 1.
 
 
 Q. Help! How do I know what pieces to get?
@@ -88,11 +73,11 @@ A. Many formats (including AVI) keep important data in the header, so you almost
 
 A reasonable strategy is to download a few small pieces in a first run, and use the results to decide what you really need. For example, suppose a file has 2000 pieces, and you think the part you want is around 1/3 of the way through. First use:
 
-	--pieces 1-5,550-555,600-605,650-655,700-705,750-755,800-805
+	--pieces 0-5,550-555,600-605,650-655,700-705,750-755,800-805
 
 Now check what's in each of the segments you grabbed. If it turns out that 650-655 ad 750-755 both are in the part you want, then you can probably get it all with:
 
-	--pieces 1-5,620-780
+	--pieces 0-5,620-780
 
 There's no harm in trying over and over, you don't have to re-download anything you've already gotten.
 
