@@ -76,7 +76,7 @@ void avi_dump(avi_chunk chunk, int indent, int full) {
 		cn = 0;
 		while (next_chunk_child(&chunk, &child)) {
 			if (!full && cn) {
-				if (is_frame_id(&child.chunk_id) || (child.chunk_id == 'LIST'
+				if (is_frame_id(child.chunk_id) || (child.chunk_id == 'LIST'
 						&& child.list_id == 'rec ')) {
 					for (i = 0; i < indent + 1; ++i) printf("  ");
 					printf(" ...\n");
@@ -164,13 +164,16 @@ avi_header avi_get_header(avi_file file) {
 	return hdr; /* make compiler happy */
 }
 
-int is_frame_id(const uint32_t *p) {
-	char *c = (char*)p;
+int is_char_frame_id(const char *c) {
 	return ((c[2] == 'w' && c[3] == 'b')
 			|| (c[2] == 'd' && (c[3] == 'c' || c[3] == 'b')))
 		&& isdigit(c[0]) && isdigit(c[1]);
 }
 
+int is_frame_id(uint32_t id) {
+	id = CFSwapInt32HostToBig(id);
+	return is_char_frame_id((char*)&id);
+}
 
 char *avi_write_hdr_chunk(avi_chunk chunk, char *buf, int *stop) {
 	char *next;
@@ -284,7 +287,7 @@ mem_range avi_find_padding(avi_header *hdr) {
 	last = cur = range.start = (char*)hdr->movi.data;
 	while (cur < range.start + hdr->movi.size) {
 		chunk = read_chunk(cur);
-		if (!is_frame_id(&chunk.chunk_id) || is_chunk_list(chunk.chunk_id))
+		if (!is_frame_id(chunk.chunk_id) || is_chunk_list(chunk.chunk_id))
 			break;
 		
 		if (pad_id) {
@@ -303,25 +306,25 @@ mem_range avi_find_padding(avi_header *hdr) {
 
 void avi_find_frames(avi_header *hdr, uint32_t offset, uint32_t maxsize,
 		avi_writer *wr) {
-	uint32_t *p;
+	char *p;
 	avi_chunk chunk;
 	char *addr, *fileend, *end, *start, *next;
 	int skip;
 	uint32_t blocksz;
 	
-	p = (uint32_t*)((char*)hdr->file.map + offset);
+	p = (char*)hdr->file.map + offset;
 	/* Can't be earlier than the movi data */
-	if (p < (uint32_t*)hdr->movi.data) p = hdr->movi.data;
+	if (p < (char*)hdr->movi.data) p = hdr->movi.data;
 	
 	fileend = (char*)hdr->file.map + hdr->file.size;
-	end = (char*)p + maxsize;
+	end = p + maxsize;
 	if (!maxsize || fileend < end) end = fileend;
 	
 	/* Find an initial frame */
 	addr = 0;
-	for (; p < (uint32_t*)end; ++p) {
-		if (is_frame_id(p)) {
-			addr = (char*)p;
+	for (; p < end; p += sizeof(uint32_t)) {
+		if (is_char_frame_id(p)) {
+			addr = p;
 			break;
 		}
 	}
@@ -339,7 +342,7 @@ void avi_find_frames(avi_header *hdr, uint32_t offset, uint32_t maxsize,
 		} else if (chunk.chunk_id == 0xFFFFFFFF) { /* damage */
 			break;
 		} else {
-			skip = !is_frame_id(&chunk.chunk_id);
+			skip = !is_frame_id(chunk.chunk_id);
 			next = (char*)chunk.data + chunk.size;
 			if ((uint32_t)next & 0x1) ++next; /* align to 2-bytes */
 		}

@@ -36,7 +36,8 @@ typedef struct {
 } mem_range;
 
 int is_chunk_list(uint32_t id);
-int is_frame_id(const uint32_t *p);
+int is_frame_id(uint32_t id);
+int is_char_frame_id(const char *c);
 
 avi_chunk read_chunk(void *addr);
 
