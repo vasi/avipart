@@ -43,7 +43,7 @@ uint32_t strtoul_die(char *str) {
 	uint32_t i = strtoul(str, &endp, 10);
 	
 	if (*str == '\0' || *endp != '\0' || errno) {
-		asprintf(&msg, "'%d' is not a number");
+		asprintf(&msg, "'%s' is not a number", str);
 		usage(msg);
 	}
 	return i;
