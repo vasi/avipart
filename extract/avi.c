@@ -21,8 +21,10 @@ int is_chunk_list(uint32_t id) {
 
 avi_chunk read_chunk(void *addr) {
 	avi_chunk chunk = *(avi_chunk*)addr;
+	chunk.chunk_id = CFSwapInt32BigToHost(chunk.chunk_id);
 	chunk.addr = addr;
 	chunk.size = CFSwapInt32LittleToHost(chunk.size);
+	chunk.list_id = CFSwapInt32BigToHost(chunk.list_id);
 	if (is_chunk_list(chunk.chunk_id)) {
 		chunk.data = (char*)addr + 12;
 		chunk.size -= 4;
@@ -64,10 +66,12 @@ void avi_dump(avi_chunk chunk, int indent, int full) {
 	int i, cn;
 	
 	for (i = 0; i < indent; ++i) printf("  ");
-	printf("'%.4s' - ", (char*)&chunk.chunk_id);
+	uint32_t cid = CFSwapInt32HostToBig(chunk.chunk_id);
+	printf("'%.4s' - ", (char*)&cid);
 	
 	if (is_chunk_list(chunk.chunk_id)) {
-		printf("'%.4s'\n", (char*)&chunk.list_id);
+		uint32_t lid = CFSwapInt32HostToBig(chunk.list_id);
+		printf("'%.4s'\n", (char*)&lid);
 		avi_chunk child = first_child;
 		cn = 0;
 		while (next_chunk_child(&chunk, &child)) {
