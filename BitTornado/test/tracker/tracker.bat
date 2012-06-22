@@ -1,1 +1,0 @@
-bttrack.py --dfile statefile1 --port 6969
