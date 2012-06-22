@@ -51,20 +51,28 @@ A. There are two parts, each has its own section below:
 
 Q. How do I download part of a torrent?
 
-FIXME: Update for partorrent
+A. Use my partorrent project: https://github.com/vasi/partorrent . It requires libtorrent-rasterbar's python bindings.
 
-A. Use my custom version of BitTornado. Either use the modified snapshot of 0.3.18 in my SVN, or apply BitTornado.patch from my SVN to a newer version of BitTornado.
+After you have it install, run './info.py mytorrent.torrent' to see the structure of the torrent file:
 
-Then from the command-line, run './btshowmetainfo.py mytorrent.torrent'. The output should include something like this:
-
-	pieces........: 2794
-	piece size....: 256K
+	Pieces: 2794
+	Piece size: 256 K
+	   0.00: myiso.iso
 
 Each torrent is divided into a bunch of pieces. This tells you how many pieces there are (here: 2794) and how large each piece is (here: 256 kibibytes).
 
-Now you can run './btdownloadcurses.py mytorrent.torrent --pieces 2000-2500' to grab only pieces 2000 thru 2499 of the torrent. You can supply more complicated piece specifications, eg: '--pieces 1-5,30,300-500,9000-' would download pieces 1 thru 4, piece 30, pieces 300 thru 499, and 9000 thru the end of the torrent.
+Now you can run './simple_client.py mytorrent.torrent 2000-2500' to grab only pieces 2000 thru 2499 of the torrent. You can supply more complicated piece specifications, eg: '0-5,30,300-500,9000-' would download pieces 0 thru 5, piece 30, pieces 300 thru 500, and 9000 thru the end of the torrent.
 
 Note that piece specifications are zero-based, ie: piece 0 is the first piece, not piece 1.
+
+
+Q. Dependencies are annoying! What can I do without libtorrent-rasterbar?
+
+A. You can use my BitTornado fork, in the 'bittornado' branch of this repo. You case use '--pieces 1234-5678' to specify the range.
+
+Warning: The BitTornado piece ranges are one-based, not zero-based.
+
+BIG WARNING: BitTornado hasn't been maintained since 2006. It doesn't support newer features of BitTorrent, and may have serious bugs.
 
 
 Q. Help! How do I know what pieces to get?
